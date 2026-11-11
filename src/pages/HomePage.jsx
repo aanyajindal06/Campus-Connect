@@ -41,73 +41,80 @@ export const HomePage = () => {
 
   // Compute category counts
   const categoryCounts = useMemo(() => {
-    const counts = { All: events.length };
+    const counts = { All: events.length, Technical: 0, Cultural: 0, Sports: 0, Workshop: 0 };
     events.forEach((evt) => {
-      const cat = evt.category || 'Other';
-      counts[cat] = (counts[cat] || 0) + 1;
+      const cat = (evt.category || '').toLowerCase();
+      if (cat === 'technical' || cat === 'technology') {
+        counts.Technical = (counts.Technical || 0) + 1;
+      } else if (cat === 'cultural') {
+        counts.Cultural = (counts.Cultural || 0) + 1;
+      } else if (cat === 'sports') {
+        counts.Sports = (counts.Sports || 0) + 1;
+      } else if (cat === 'workshop' || cat === 'workshops') {
+        counts.Workshop = (counts.Workshop || 0) + 1;
+      }
     });
     return counts;
   }, [events]);
 
-  // Filtered & searched events
+  // Combined Search by Title & Category Filtering
   const filteredEvents = useMemo(() => {
     return events.filter((evt) => {
-      if (selectedCategory !== 'All' && evt.category !== selectedCategory) {
-        return false;
+      // 1. Category Filter: Technical, Cultural, Sports, Workshop (or All)
+      if (selectedCategory !== 'All') {
+        const target = selectedCategory.toLowerCase();
+        const cat = (evt.category || '').toLowerCase();
+        const matchesCategory =
+          cat === target ||
+          (target === 'technical' && cat === 'technology') ||
+          (target === 'workshop' && cat === 'workshops');
+
+        if (!matchesCategory) return false;
       }
 
+      // 2. Search by event title
+      if (searchTerm.trim()) {
+        const query = searchTerm.toLowerCase().trim();
+        const matchesTitle = evt.title?.toLowerCase().includes(query);
+        if (!matchesTitle) return false;
+      }
+
+      // 3. Optional available slots filter
       if (filterAvailableOnly) {
         const capacity = Number(evt.capacity) || 0;
         const registered = Number(evt.registeredCount) || 0;
         if (registered >= capacity) return false;
       }
 
-      if (searchTerm.trim()) {
-        const query = searchTerm.toLowerCase();
-        const inTitle = evt.title?.toLowerCase().includes(query);
-        const inDesc = evt.description?.toLowerCase().includes(query);
-        const inVenue = evt.venue?.toLowerCase().includes(query);
-        const inOrg = evt.organizer?.toLowerCase().includes(query);
-        const inTags = Array.isArray(evt.tags) && evt.tags.some((t) => t.toLowerCase().includes(query));
-
-        return inTitle || inDesc || inVenue || inOrg || inTags;
-      }
-
       return true;
     });
   }, [events, selectedCategory, filterAvailableOnly, searchTerm]);
 
-  // 5 Program Category Cards corresponding to reference image
+  // Program Category Cards matching the required categories
   const programCards = [
     {
-      title: 'Technology & Coding',
-      category: 'Technology',
+      title: 'Technical',
+      category: 'Technical',
       icon: <Cpu className="w-10 h-10 text-navy-800" />,
       description: 'Hackathons, algorithmic coding competitions, and AI robotics demonstrations.'
     },
     {
-      title: 'Cultural & Arts',
+      title: 'Cultural',
       category: 'Cultural',
       icon: <Palette className="w-10 h-10 text-navy-800" />,
       description: 'Inter-college indie music concerts, theatrical plays, and creative exhibitions.'
     },
     {
-      title: 'Workshops & Labs',
-      category: 'Workshops',
-      icon: <Microscope className="w-10 h-10 text-navy-800" />,
-      description: 'Hands-on AI bootcamps, design sprints, and practical technical seminars.'
-    },
-    {
-      title: 'Sports & Athletics',
+      title: 'Sports',
       category: 'Sports',
       icon: <Stethoscope className="w-10 h-10 text-navy-800" />,
       description: 'Inter-departmental football cups, campus tournaments, and fitness marathons.'
     },
     {
-      title: 'Career & Academic',
-      category: 'Career & Academic',
-      icon: <GraduationCap className="w-10 h-10 text-navy-800" />,
-      description: 'Campus career expos, recruiter networking, and graduate school panels.'
+      title: 'Workshop',
+      category: 'Workshop',
+      icon: <Microscope className="w-10 h-10 text-navy-800" />,
+      description: 'Hands-on AI bootcamps, design sprints, and practical technical seminars.'
     }
   ];
 
@@ -440,24 +447,51 @@ export const HomePage = () => {
               ))}
             </div>
           ) : filteredEvents.length === 0 ? (
-            <div className="bg-white rounded border border-slate-200 p-12 text-center max-w-lg mx-auto my-10 shadow-sm">
+            <div className="bg-white rounded border border-slate-200 p-10 sm:p-14 text-center max-w-lg mx-auto my-10 shadow-sm animate-in fade-in duration-200">
               <div className="w-16 h-16 rounded bg-cream-100 text-slate-400 flex items-center justify-center mx-auto mb-4 border border-gold-500/20">
                 <SearchX className="w-8 h-8 text-gold-600" />
               </div>
-              <h3 className="text-base font-bold text-navy-900 font-serif">No Events Found</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
-                We couldn't find any events matching your selected criteria. Try adjusting your search query or reset filters.
+              <h3 className="text-lg font-bold text-navy-900 font-serif">No Events Found</h3>
+              <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
+                {searchTerm && selectedCategory !== 'All' ? (
+                  <>
+                    No events found with title matching <strong className="text-navy-900">"{searchTerm}"</strong> under the{' '}
+                    <strong className="text-navy-900">{selectedCategory}</strong> category.
+                  </>
+                ) : searchTerm ? (
+                  <>
+                    No events found with title matching <strong className="text-navy-900">"{searchTerm}"</strong>.
+                  </>
+                ) : selectedCategory !== 'All' ? (
+                  <>
+                    There are currently no events listed under the <strong className="text-navy-900">{selectedCategory}</strong> category.
+                  </>
+                ) : (
+                  'No events currently match your selected filters.'
+                )}
               </p>
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('All');
-                  setFilterAvailableOnly(false);
-                }}
-                className="mt-5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-navy-900 bg-gold-400/20 hover:bg-gold-400/40 border border-gold-500/40 rounded transition-colors"
-              >
-                Reset All Filters
-              </button>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-navy-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded transition-colors"
+                  >
+                    Clear Search Title
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('All');
+                    setFilterAvailableOnly(false);
+                  }}
+                  className="px-5 py-2 text-xs font-bold uppercase tracking-wider text-white bg-gold-500 hover:bg-gold-600 rounded transition-colors shadow-sm"
+                >
+                  Reset All Filters
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

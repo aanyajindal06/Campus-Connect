@@ -1,17 +1,16 @@
 export const CATEGORIES = [
   'All',
-  'Technology',
+  'Technical',
   'Cultural',
-  'Workshops',
   'Sports',
-  'Career & Academic'
+  'Workshop'
 ];
 
 export const INITIAL_EVENTS = [
   {
     id: 'evt-1',
     title: 'HackCampus 2026: 24-Hour Hackathon',
-    category: 'Technology',
+    category: 'Technical',
     description: 'Join over 300 passionate student developers, designers, and innovators for 24 hours of hacking, building, and learning! Free food, swag packs, hardware lab access, and $5,000 in prizes await. Mentors from top tech companies will be on-site to assist your team.',
     date: '2026-11-20',
     startTime: '10:00 AM',
@@ -45,7 +44,7 @@ export const INITIAL_EVENTS = [
   {
     id: 'evt-3',
     title: 'Mastering AI & Large Language Models Workshop',
-    category: 'Workshops',
+    category: 'Workshop',
     description: 'Hands-on workshop introducing prompt engineering, fine-tuning lightweight models, and building agentic AI applications with modern frameworks. Prerequisite: Basic Python understanding. Please bring your laptop with VS Code installed.',
     date: '2026-11-18',
     startTime: '02:00 PM',
@@ -78,25 +77,25 @@ export const INITIAL_EVENTS = [
   },
   {
     id: 'evt-5',
-    title: 'Annual Campus Career & Internship Fair',
-    category: 'Career & Academic',
-    description: 'Connect with over 45 recruiting partners from tech, finance, consulting, biomedical, and creative design industries. Open exclusively to juniors, seniors, and postgraduate students. Bring multiple printed copies of your resume.',
+    title: 'Hands-On Full-Stack Web Development Workshop',
+    category: 'Workshop',
+    description: 'Build and deploy a full-stack interactive application from scratch using React and modern serverless architectures. Mentorship by senior alumni software engineers.',
     date: '2026-11-28',
-    startTime: '09:30 AM',
+    startTime: '10:00 AM',
     endTime: '04:30 PM',
-    venue: 'Campus Convention Center, Exhibition Hall B',
-    organizer: 'Career Services & Placement Cell',
-    capacity: 800,
-    registeredCount: 520,
+    venue: 'Campus Convention Center, Lab 4',
+    organizer: 'Developer Student Club',
+    capacity: 80,
+    registeredCount: 45,
     bannerUrl: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Career', 'Jobs', 'Internships', 'Networking'],
+    tags: ['Workshop', 'WebDev', 'React', 'Hands-on'],
     isFeatured: true,
     createdAt: '2026-11-06T14:00:00Z'
   },
   {
     id: 'evt-6',
     title: 'Robotics & Autonomous Drones Showcase',
-    category: 'Technology',
+    category: 'Technical',
     description: 'Experience live obstacle navigation, autonomous drone racing, and humanoid robotic demonstrations developed by senior engineering students. Interactive robotics station available for attendees to test manual drone flight.',
     date: '2026-12-02',
     startTime: '01:00 PM',

@@ -10,8 +10,8 @@ export const EventFilter = ({
 }) => {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-2">
-      {/* Category Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto w-full pb-1 sm:pb-0 scrollbar-none">
+      {/* Responsive Category Filter Buttons */}
+      <div className="flex items-center gap-1.5 overflow-x-auto w-full pb-1 sm:pb-0 scrollbar-none" role="tablist" aria-label="Event category filters">
         {CATEGORIES.map((cat) => {
           const isSelected = selectedCategory === cat;
           const count = categoryCounts[cat];
@@ -19,6 +19,9 @@ export const EventFilter = ({
           return (
             <button
               key={cat}
+              type="button"
+              role="tab"
+              aria-selected={isSelected}
               onClick={() => onSelectCategory(cat)}
               className={`px-3.5 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 uppercase tracking-wider ${
                 isSelected
@@ -43,19 +46,21 @@ export const EventFilter = ({
         })}
       </div>
 
-      {/* Available Spots Toggle */}
-      <div className="flex items-center gap-2 shrink-0">
-        <label className="inline-flex items-center cursor-pointer select-none text-xs font-medium text-slate-700 hover:text-navy-900">
-          <input
-            type="checkbox"
-            checked={filterAvailableOnly}
-            onChange={(e) => setFilterAvailableOnly(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-gold-500 relative"></div>
-          <span className="ml-2 font-medium">Available slots only</span>
-        </label>
-      </div>
+      {/* Available Slots Toggle */}
+      {setFilterAvailableOnly && (
+        <div className="flex items-center gap-2 shrink-0">
+          <label className="inline-flex items-center cursor-pointer select-none text-xs font-medium text-slate-700 hover:text-navy-900">
+            <input
+              type="checkbox"
+              checked={filterAvailableOnly}
+              onChange={(e) => setFilterAvailableOnly(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-gold-500 relative"></div>
+            <span className="ml-2 font-medium">Available slots only</span>
+          </label>
+        </div>
+      )}
     </div>
   );
 };

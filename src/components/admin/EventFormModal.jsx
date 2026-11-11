@@ -8,7 +8,7 @@ export const EventFormModal = ({ isOpen, onClose, onSubmit, initialEvent = null 
 
   const defaultForm = {
     title: '',
-    category: 'Technology',
+    category: 'Technical',
     description: '',
     date: '',
     startTime: '10:00 AM',

@@ -47,14 +47,14 @@ export const AdminDashboardPage = () => {
 
   // Filtered Events
   const filteredEvents = useMemo(() => {
-    if (!searchTerm.trim()) return events;
-    const q = searchTerm.toLowerCase();
-    return events.filter(
+    const q = (searchTerm || '').toLowerCase().trim();
+    if (!q) return events || [];
+    return (events || []).filter(
       (e) =>
-        e.title.toLowerCase().includes(q) ||
-        e.category.toLowerCase().includes(q) ||
-        e.venue.toLowerCase().includes(q) ||
-        e.organizer.toLowerCase().includes(q)
+        (e?.title || '').toLowerCase().includes(q) ||
+        (e?.category || '').toLowerCase().includes(q) ||
+        (e?.venue || '').toLowerCase().includes(q) ||
+        (e?.organizer || '').toLowerCase().includes(q)
     );
   }, [events, searchTerm]);
 

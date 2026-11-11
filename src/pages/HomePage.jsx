@@ -59,10 +59,14 @@ export const HomePage = () => {
 
   // Combined Search by Title & Category Filtering
   const filteredEvents = useMemo(() => {
-    return events.filter((evt) => {
+    const query = (searchTerm || '').toLowerCase().trim();
+
+    return (events || []).filter((evt) => {
+      if (!evt) return false;
+
       // 1. Category Filter: Technical, Cultural, Sports, Workshop (or All)
-      if (selectedCategory !== 'All') {
-        const target = selectedCategory.toLowerCase();
+      if (selectedCategory && selectedCategory !== 'All') {
+        const target = (selectedCategory || '').toLowerCase();
         const cat = (evt.category || '').toLowerCase();
         const matchesCategory =
           cat === target ||
@@ -72,11 +76,10 @@ export const HomePage = () => {
         if (!matchesCategory) return false;
       }
 
-      // 2. Search by event title
-      if (searchTerm.trim()) {
-        const query = searchTerm.toLowerCase().trim();
-        const matchesTitle = evt.title?.toLowerCase().includes(query);
-        if (!matchesTitle) return false;
+      // 2. Search by event title (safely handles empty input, normal search and missing titles)
+      if (query) {
+        const title = (evt.title || '').toLowerCase();
+        if (!title.includes(query)) return false;
       }
 
       // 3. Optional available slots filter

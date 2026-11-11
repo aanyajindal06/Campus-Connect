@@ -61,7 +61,7 @@ export const MyRegistrationsPage = () => {
         </div>
       ) : (
         <div className="mt-8 space-y-4">
-          {registeredEvents.map(({ id: regId, registeredAt, studentName, studentRoll, event }) => (
+          {registeredEvents.map(({ id: regId, registeredAt, studentName, studentEmail, studentRoll, event }) => (
             <div
               key={regId}
               className="bg-white rounded border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col md:flex-row items-stretch"
@@ -113,9 +113,10 @@ export const MyRegistrationsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-4 text-[11px] text-slate-500">
+                  <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
                     <span>Attendee: <strong className="text-navy-900">{studentName}</strong></span>
-                    {studentRoll && <span>Roll No: <strong className="text-navy-900">{studentRoll}</strong></span>}
+                    {studentEmail && <span>Email: <strong className="text-navy-900">{studentEmail}</strong></span>}
+                    {studentRoll && studentRoll !== 'N/A' && <span>Roll No: <strong className="text-navy-900">{studentRoll}</strong></span>}
                   </div>
                 </div>
 

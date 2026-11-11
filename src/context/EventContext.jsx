@@ -11,6 +11,18 @@ export const EventProvider = ({ children }) => {
   const [userRegistrations, setUserRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [registrationModalEvent, setRegistrationModalEvent] = useState(null);
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
+
+  const openRegistrationModal = useCallback((event = null) => {
+    setRegistrationModalEvent(event);
+    setIsRegistrationModalOpen(true);
+  }, []);
+
+  const closeRegistrationModal = useCallback(() => {
+    setIsRegistrationModalOpen(false);
+    setRegistrationModalEvent(null);
+  }, []);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ id: Date.now(), message, type });
@@ -24,7 +36,7 @@ export const EventProvider = ({ children }) => {
     try {
       const allEvents = eventService.getAllEvents();
       const allBookmarks = eventService.getBookmarks();
-      const myRegs = eventService.getRegistrationsByUser(currentUser.id);
+      const myRegs = eventService.getRegistrationsByUser(currentUser.id, currentUser.email);
 
       setEvents(allEvents);
       setBookmarks(allBookmarks);
@@ -35,7 +47,7 @@ export const EventProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser.id, showToast]);
+  }, [currentUser.id, currentUser.email, showToast]);
 
   useEffect(() => {
     refreshData();
@@ -55,7 +67,7 @@ export const EventProvider = ({ children }) => {
       return true;
     } catch (error) {
       showToast(error.message || 'Registration failed', 'error');
-      return false;
+      throw error;
     }
   };
 
@@ -136,6 +148,10 @@ export const EventProvider = ({ children }) => {
         userRegistrations,
         loading,
         toast,
+        isRegistrationModalOpen,
+        registrationModalEvent,
+        openRegistrationModal,
+        closeRegistrationModal,
         showToast,
         clearToast,
         refreshData,

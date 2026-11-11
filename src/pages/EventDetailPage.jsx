@@ -22,16 +22,7 @@ import { validateRegistrationPayload } from '../utils/validators';
 export const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { events, bookmarks, userRegistrations, handleRegister, handleCancelRegistration, handleToggleBookmark, showToast } = useEvents();
-  const { currentUser } = useAuth();
-
-  const [registerModalOpen, setRegisterModalOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
-  const [formData, setFormData] = useState({
-    studentName: currentUser.name || '',
-    studentEmail: currentUser.email || '',
-    studentRoll: currentUser.roll || ''
-  });
+  const { events, bookmarks, userRegistrations, handleCancelRegistration, handleToggleBookmark, showToast, openRegistrationModal } = useEvents();
 
   const event = events.find((e) => e.id === id);
 
@@ -288,7 +279,7 @@ export const EventDetailPage = () => {
                   <button
                     type="button"
                     disabled={isFull}
-                    onClick={() => setRegisterModalOpen(true)}
+                    onClick={() => openRegistrationModal(event)}
                     className={`w-full py-3 px-4 rounded text-xs font-bold uppercase tracking-wider transition-all shadow-sm ${
                       isFull
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
@@ -312,98 +303,6 @@ export const EventDetailPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Registration Confirmation Modal */}
-      {registerModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Confirm Your Registration</h3>
-                <p className="text-xs text-slate-500">{event.title}</p>
-              </div>
-            </div>
-
-            <form onSubmit={onConfirmRegistration} className="space-y-3.5 text-left">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.studentName}
-                  onChange={(e) => {
-                    setFormData({ ...formData, studentName: e.target.value });
-                    if (formErrors.studentName) setFormErrors({ ...formErrors, studentName: null });
-                  }}
-                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    formErrors.studentName ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
-                  }`}
-                />
-                {formErrors.studentName && <p className="text-xs text-rose-500 mt-1">{formErrors.studentName}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Campus Email *
-                </label>
-                <input
-                  type="email"
-                  value={formData.studentEmail}
-                  onChange={(e) => {
-                    setFormData({ ...formData, studentEmail: e.target.value });
-                    if (formErrors.studentEmail) setFormErrors({ ...formErrors, studentEmail: null });
-                  }}
-                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    formErrors.studentEmail ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
-                  }`}
-                />
-                {formErrors.studentEmail && <p className="text-xs text-rose-500 mt-1">{formErrors.studentEmail}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Student Roll / ID *
-                </label>
-                <input
-                  type="text"
-                  value={formData.studentRoll}
-                  onChange={(e) => {
-                    setFormData({ ...formData, studentRoll: e.target.value });
-                    if (formErrors.studentRoll) setFormErrors({ ...formErrors, studentRoll: null });
-                  }}
-                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    formErrors.studentRoll ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
-                  }`}
-                />
-                {formErrors.studentRoll && <p className="text-xs text-rose-500 mt-1">{formErrors.studentRoll}</p>}
-              </div>
-
-              <div className="pt-4 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormErrors({});
-                    setRegisterModalOpen(false);
-                  }}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/20 transition-all"
-                >
-                  Confirm Registration
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

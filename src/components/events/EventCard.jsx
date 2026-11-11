@@ -14,7 +14,7 @@ import { formatDate } from '../../utils/dateUtils';
 import { useEvents } from '../../context/EventContext';
 
 export const EventCard = ({ event, onEdit, onDelete, showAdminControls = false }) => {
-  const { bookmarks, handleToggleBookmark, userRegistrations, handleRegister } = useEvents();
+  const { bookmarks, handleToggleBookmark, userRegistrations, openRegistrationModal } = useEvents();
 
   const isBookmarked = bookmarks.includes(event.id);
   const isRegistered = userRegistrations.some((r) => r.eventId === event.id);
@@ -183,7 +183,7 @@ export const EventCard = ({ event, onEdit, onDelete, showAdminControls = false }
                   <button
                     type="button"
                     disabled={isFull}
-                    onClick={() => handleRegister(event.id)}
+                    onClick={() => openRegistrationModal(event)}
                     className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded transition-all shadow-sm ${
                       isFull
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed'

@@ -57,21 +57,24 @@ export const validateEventPayload = (formData) => {
 export const validateRegistrationPayload = (formData) => {
   const errors = {};
 
+  if (!formData.eventId || !formData.eventId.trim()) {
+    errors.eventId = 'Please select an event to register.';
+  }
+
   if (!formData.studentName || !formData.studentName.trim()) {
     errors.studentName = 'Full name is required.';
+  } else if (formData.studentName.trim().length < 2) {
+    errors.studentName = 'Name must be at least 2 characters.';
   }
 
   if (!formData.studentEmail || !formData.studentEmail.trim()) {
-    errors.studentEmail = 'Campus email is required.';
+    errors.studentEmail = 'Email address is required.';
   } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Standard RFC-compliant email validation regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
     if (!emailRegex.test(formData.studentEmail.trim())) {
-      errors.studentEmail = 'Please provide a valid email address.';
+      errors.studentEmail = 'Please provide a valid email address (e.g., student@campus.edu).';
     }
-  }
-
-  if (!formData.studentRoll || !formData.studentRoll.trim()) {
-    errors.studentRoll = 'Student ID / Roll number is required.';
   }
 
   return {

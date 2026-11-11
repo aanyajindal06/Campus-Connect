@@ -1,6 +1,6 @@
-import { STORAGE_KEYS } from './storageKeys';
-import { storageAdapter } from './storageAdapter';
-import { INITIAL_EVENTS, INITIAL_REGISTRATIONS, INITIAL_BOOKMARKS } from './seedData';
+import { STORAGE_KEYS } from './storageKeys.js';
+import { storageAdapter } from './storageAdapter.js';
+import { INITIAL_EVENTS, INITIAL_REGISTRATIONS, INITIAL_BOOKMARKS } from './seedData.js';
 
 // Initialize default data if this is the first run
 export const initializeData = () => {
@@ -77,9 +77,14 @@ export const eventService = {
   },
 
   // Registrations
-  getRegistrationsByUser: (userId = 'student-default') => {
+  getRegistrationsByUser: (userId = 'student-default', email = '') => {
     const registrations = storageAdapter.get(STORAGE_KEYS.REGISTRATIONS, []);
-    return registrations.filter((r) => r.userId === userId);
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    return registrations.filter((r) => {
+      const matchUserId = r.userId === userId;
+      const matchEmail = normalizedEmail && r.studentEmail && r.studentEmail.trim().toLowerCase() === normalizedEmail;
+      return matchUserId || matchEmail;
+    });
   },
 
   getRegistrationsForEvent: (eventId) => {
@@ -87,9 +92,16 @@ export const eventService = {
     return registrations.filter((r) => r.eventId === eventId);
   },
 
-  isRegistered: (eventId, userId = 'student-default') => {
-    const registrations = eventService.getRegistrationsByUser(userId);
-    return registrations.some((r) => r.eventId === eventId);
+  isRegistered: (eventId, userId = 'student-default', email = '') => {
+    const registrations = storageAdapter.get(STORAGE_KEYS.REGISTRATIONS, []);
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    return registrations.some((r) => {
+      if (r.eventId !== eventId) return false;
+      if (normalizedEmail && r.studentEmail && r.studentEmail.trim().toLowerCase() === normalizedEmail) {
+        return true;
+      }
+      return r.userId === userId;
+    });
   },
 
   registerForEvent: (eventId, studentDetails, userId = 'student-default') => {
@@ -102,17 +114,28 @@ export const eventService = {
     const event = events[eventIndex];
 
     // Check capacity
-    if (event.registeredCount >= event.capacity) {
+    if (Number(event.registeredCount) >= Number(event.capacity)) {
       throw new Error('Sorry, this event is already at maximum capacity.');
     }
 
-    // Check if already registered
     const registrations = storageAdapter.get(STORAGE_KEYS.REGISTRATIONS, []);
-    const alreadyRegistered = registrations.some(
+    const studentEmail = (studentDetails.studentEmail || '').trim().toLowerCase();
+
+    // Prevent duplicate registrations for the same event using the same email
+    if (studentEmail) {
+      const emailAlreadyRegistered = registrations.some(
+        (r) => r.eventId === eventId && r.studentEmail && r.studentEmail.trim().toLowerCase() === studentEmail
+      );
+      if (emailAlreadyRegistered) {
+        throw new Error(`The email "${studentDetails.studentEmail}" is already registered for this event.`);
+      }
+    }
+
+    // Also check by userId
+    const alreadyRegisteredByUser = registrations.some(
       (r) => r.eventId === eventId && r.userId === userId
     );
-
-    if (alreadyRegistered) {
+    if (alreadyRegisteredByUser) {
       throw new Error('You are already registered for this event.');
     }
 
@@ -121,9 +144,9 @@ export const eventService = {
       id: `reg-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
       eventId,
       userId,
-      studentName: studentDetails.studentName || 'Student Attendee',
-      studentEmail: studentDetails.studentEmail || 'student@campus.edu',
-      studentRoll: studentDetails.studentRoll || 'N/A',
+      studentName: studentDetails.studentName.trim(),
+      studentEmail: studentDetails.studentEmail.trim(),
+      studentRoll: studentDetails.studentRoll ? studentDetails.studentRoll.trim() : 'N/A',
       registeredAt: new Date().toISOString()
     };
 
@@ -133,7 +156,7 @@ export const eventService = {
     // Increment count on event
     events[eventIndex] = {
       ...event,
-      registeredCount: (event.registeredCount || 0) + 1
+      registeredCount: (Number(event.registeredCount) || 0) + 1
     };
     storageAdapter.set(STORAGE_KEYS.EVENTS, events);
 
